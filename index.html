@@ -1,1 +1,861 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <link rel="icon" type="image/jpeg" href="icon.JPG">
+<link rel="apple-touch-icon" href="icon.JPG">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="غرفة الأفكار">
+<title>غرفة الأفكار</title>
 
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0b1020;
+  --bg2:#111827;
+  --panel:rgba(255,255,255,.065);
+  --panel2:rgba(255,255,255,.095);
+  --border:rgba(255,255,255,.1);
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --accent:#8b5cf6;
+  --accent2:#06b6d4;
+  --danger:#ef4444;
+  --shadow:0 20px 60px rgba(0,0,0,.28);
+}
+body{
+  min-height:100vh;
+  font-family:"Cairo","Segoe UI",Tahoma,sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%,rgba(139,92,246,.16),transparent 28%),
+    radial-gradient(circle at 85% 85%,rgba(6,182,212,.11),transparent 30%),
+    var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:flex}
+.sidebar{
+  width:270px;
+  min-height:100vh;
+  padding:24px 18px;
+  background:rgba(8,13,27,.82);
+  backdrop-filter:blur(22px);
+  border-left:1px solid var(--border);
+  position:fixed;
+  right:0;
+  top:0;
+  z-index:20;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px 8px 28px;
+}
+.logo-mark{
+  width:46px;height:46px;border-radius:15px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 12px 30px rgba(139,92,246,.25);
+  font-size:22px;
+}
+.logo h1{font-size:18px}
+.logo p{font-size:11px;color:var(--muted);margin-top:2px}
+.nav{display:grid;gap:7px}
+.nav button{
+  border:0;background:transparent;color:var(--muted);
+  padding:13px 14px;border-radius:13px;
+  text-align:right;transition:.2s;
+}
+.nav button:hover,.nav button.active{
+  background:var(--panel2);
+  color:var(--text);
+}
+.nav button.active{box-shadow:inset -3px 0 var(--accent)}
+.sidebar-bottom{
+  position:absolute;bottom:24px;right:18px;left:18px;
+}
+.stats-mini{
+  padding:15px;border:1px solid var(--border);
+  background:var(--panel);border-radius:17px;
+}
+.stats-mini strong{font-size:26px;display:block}
+.stats-mini span{color:var(--muted);font-size:12px}
+
+.main{
+  width:calc(100% - 270px);
+  margin-right:270px;
+  min-height:100vh;
+  padding:28px;
+}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:20px;margin-bottom:28px;
+}
+.title h2{font-size:27px}
+.title p{color:var(--muted);font-size:13px;margin-top:5px}
+.top-actions{display:flex;gap:10px}
+.btn{
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);
+  border-radius:13px;
+  padding:11px 16px;
+  transition:.2s;
+}
+.btn:hover{background:var(--panel2);transform:translateY(-1px)}
+.btn.primary{
+  border:0;
+  background:linear-gradient(135deg,var(--accent),#6d28d9);
+  box-shadow:0 10px 25px rgba(139,92,246,.22);
+}
+.btn.danger{color:#fecaca}
+.mobile-menu{display:none}
+
+.hero{
+  border:1px solid var(--border);
+  border-radius:25px;
+  padding:25px;
+  background:
+    radial-gradient(circle at 85% 20%,rgba(139,92,246,.2),transparent 30%),
+    var(--panel);
+  margin-bottom:20px;
+}
+.hero-content{max-width:760px}
+.hero h3{font-size:24px;margin-bottom:7px}
+.hero p{color:var(--muted);font-size:13px;line-height:1.9}
+.search{
+  margin-top:20px;
+  position:relative;
+}
+.search input{
+  width:100%;padding:14px 18px;
+  border-radius:15px;border:1px solid var(--border);
+  background:rgba(0,0,0,.18);color:var(--text);
+  outline:none;
+}
+.search input:focus{border-color:rgba(139,92,246,.6)}
+
+.filters{
+  display:flex;gap:8px;overflow:auto;padding-bottom:5px;margin-bottom:20px;
+}
+.filter{
+  white-space:nowrap;border:1px solid var(--border);
+  background:var(--panel);color:var(--muted);
+  padding:8px 13px;border-radius:20px;
+}
+.filter.active{color:#fff;background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.45)}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+.card{
+  position:relative;
+  min-height:210px;
+  padding:19px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:var(--panel);
+  box-shadow:0 10px 35px rgba(0,0,0,.12);
+  transition:.25s;
+  overflow:hidden;
+}
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(139,92,246,.3);
+  box-shadow:var(--shadow);
+}
+.card::before{
+  content:"";
+  position:absolute;right:0;top:0;bottom:0;width:3px;
+  background:var(--card-color,var(--accent));
+}
+.card-top{
+  display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
+}
+.category{
+  font-size:11px;padding:5px 9px;border-radius:20px;
+  background:rgba(255,255,255,.07);color:var(--muted);
+}
+.more{
+  border:0;background:transparent;color:var(--muted);font-size:20px;
+}
+.card h4{font-size:18px;margin:20px 0 8px}
+.card p{
+  color:var(--muted);font-size:12px;line-height:1.8;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:15px}
+.tag{
+  font-size:10px;color:#cbd5e1;
+  background:rgba(255,255,255,.055);
+  padding:4px 8px;border-radius:8px;
+}
+.card-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:18px;color:var(--muted);font-size:10px;
+}
+.empty{
+  grid-column:1/-1;
+  padding:60px 20px;text-align:center;
+  border:1px dashed var(--border);border-radius:20px;color:var(--muted);
+}
+
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(2,6,23,.72);
+  backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  z-index:100;padding:20px;
+}
+.overlay.show{display:flex}
+.modal{
+  width:min(620px,100%);
+  max-height:90vh;overflow:auto;
+  background:#101827;
+  border:1px solid var(--border);
+  border-radius:25px;
+  padding:23px;
+  box-shadow:var(--shadow);
+}
+.modal-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:22px;
+}
+.modal-head h3{font-size:20px}
+.close{
+  border:0;background:var(--panel);color:var(--text);
+  width:38px;height:38px;border-radius:12px;
+}
+.form{display:grid;gap:15px}
+.field{display:grid;gap:7px}
+.field label{font-size:12px;color:#cbd5e1}
+.field input,.field textarea,.field select{
+  width:100%;border:1px solid var(--border);
+  background:rgba(0,0,0,.18);color:var(--text);
+  border-radius:13px;padding:12px;outline:none;
+}
+.field textarea{min-height:130px;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:rgba(139,92,246,.65)
+}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:5px}
+
+.dashboard{
+  display:none;
+}
+.dashboard.show{display:block}
+.section-title{
+  display:flex;justify-content:space-between;align-items:center;
+  margin:25px 0 14px;
+}
+.section-title h3{font-size:17px}
+.section-title span{font-size:11px;color:var(--muted)}
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+}
+.stat{
+  padding:19px;border:1px solid var(--border);
+  background:var(--panel);border-radius:18px;
+}
+.stat span{color:var(--muted);font-size:11px}
+.stat strong{font-size:27px;display:block;margin-top:6px}
+.progress{
+  height:6px;background:rgba(255,255,255,.07);
+  border-radius:10px;margin-top:12px;overflow:hidden;
+}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0}
+
+.detail{
+  display:none;
+}
+.detail.show{display:block}
+.detail-card{
+  border:1px solid var(--border);background:var(--panel);
+  border-radius:24px;padding:26px;
+}
+.detail-card h2{font-size:27px;margin:15px 0 10px}
+.detail-card .body{color:#cbd5e1;line-height:2;font-size:14px;white-space:pre-wrap}
+.detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+.detail-actions{display:flex;gap:8px;margin-top:25px;flex-wrap:wrap}
+
+@media(max-width:1050px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  .sidebar{
+    transform:translateX(100%);
+    transition:.25s;
+    box-shadow:var(--shadow);
+  }
+  .sidebar.open{transform:translateX(0)}
+  .main{width:100%;margin-right:0;padding:18px}
+  .mobile-menu{display:block}
+  .topbar{align-items:flex-start}
+  .title h2{font-size:22px}
+  .top-actions .desktop-only{display:none}
+  .hero{padding:20px}
+  .hero h3{font-size:20px}
+  .grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:430px){
+  .main{padding:14px}
+  .topbar{margin-bottom:18px}
+  .top-actions{gap:6px}
+  .btn{padding:9px 11px}
+  .hero{border-radius:19px}
+  .card{min-height:190px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">✦</div>
+    <div>
+      <h1>غرفة الأفكار</h1>
+      <p>حوّل الأفكار إلى شيء أكبر</p>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="active" data-page="ideas">💡 غرفة الأفكار</button>
+    <button data-page="favorites">☆ المفضلة</button>
+    <button data-page="projects">◈ المشاريع</button>
+    <button data-page="archive">▣ الأرشيف</button>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="stats-mini">
+      <strong id="sideCount">0</strong>
+      <span>فكرة محفوظة</span>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <header class="topbar">
+    <div class="title">
+      <h2 id="pageTitle">غرفة الأفكار</h2>
+      <p id="pageSubtitle">مساحتك الخاصة للأفكار والمشاريع.</p>
+    </div>
+
+    <div class="top-actions">
+      <button class="btn mobile-menu" id="menuBtn">☰</button>
+      <button class="btn desktop-only" id="randomBtn">فكرة عشوائية</button>
+      <button class="btn primary" id="addBtn">＋ فكرة جديدة</button>
+    </div>
+  </header>
+
+  <section class="dashboard show" id="ideasPage">
+
+    <div class="hero">
+      <div class="hero-content">
+        <h3>كل فكرة قد تكون بداية شيء عظيم.</h3>
+        <p>اكتب أفكارك، اربط بينها، وحوّل الفكرة التي تستحق إلى مشروع.</p>
+
+        <div class="search">
+          <input id="searchInput" type="search" placeholder="ابحث في أفكارك...">
+        </div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button class="filter active" data-filter="all">الكل</button>
+      <button class="filter" data-filter="مشروع">مشاريع</button>
+      <button class="filter" data-filter="محتوى">محتوى</button>
+      <button class="filter" data-filter="دراسة">دراسة</button>
+      <button class="filter" data-filter="تقنية">تقنية</button>
+      <button class="filter" data-filter="فكرة">أفكار عامة</button>
+    </div>
+
+    <div class="grid" id="ideasGrid"></div>
+
+  </section>
+
+  <section class="dashboard" id="favoritesPage">
+    <div class="section-title">
+      <h3>الأفكار المفضلة</h3>
+      <span id="favoriteCount">0 فكرة</span>
+    </div>
+    <div class="grid" id="favoritesGrid"></div>
+  </section>
+
+  <section class="dashboard" id="projectsPage">
+    <div class="section-title">
+      <h3>المشاريع</h3>
+      <span>الأفكار التي تحولت إلى مشاريع</span>
+    </div>
+    <div class="grid" id="projectsGrid"></div>
+  </section>
+
+  <section class="dashboard" id="archivePage">
+    <div class="section-title">
+      <h3>الأرشيف</h3>
+      <span>الأفكار المؤرشفة</span>
+    </div>
+    <div class="grid" id="archiveGrid"></div>
+  </section>
+
+  <section class="detail" id="detailPage">
+    <div class="detail-card">
+      <button class="btn" id="backBtn">← العودة</button>
+      <div class="detail-meta" id="detailMeta"></div>
+      <h2 id="detailTitle"></h2>
+      <div class="body" id="detailBody"></div>
+      <div class="tags" id="detailTags"></div>
+      <div class="detail-actions">
+        <button class="btn" id="favoriteDetailBtn">☆ المفضلة</button>
+        <button class="btn" id="projectDetailBtn">◈ تحويل إلى مشروع</button>
+        <button class="btn" id="archiveDetailBtn">▣ أرشفة</button>
+        <button class="btn danger" id="deleteDetailBtn">حذف</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<div class="overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">فكرة جديدة</h3>
+      <button class="close" id="closeModal">×</button>
+    </div>
+
+    <form class="form" id="ideaForm">
+      <div class="field">
+        <label>عنوان الفكرة</label>
+        <input id="ideaTitle" required maxlength="100" placeholder="مثال: تطبيق يحول القراءة إلى رحلة">
+      </div>
+
+      <div class="field">
+        <label>الفكرة</label>
+        <textarea id="ideaBody" required placeholder="اكتب فكرتك بالتفصيل..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>التصنيف</label>
+        <select id="ideaCategory">
+          <option value="فكرة">فكرة عامة</option>
+          <option value="مشروع">مشروع</option>
+          <option value="محتوى">محتوى</option>
+          <option value="دراسة">دراسة</option>
+          <option value="تقنية">تقنية</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>الكلمات المفتاحية</label>
+        <input id="ideaTags" placeholder="ذكاء اصطناعي، قراءة، تطبيق">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn" id="cancelBtn">إلغاء</button>
+        <button type="submit" class="btn primary">حفظ الفكرة</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const STORAGE_KEY = "idea_room_v1";
+
+const state = {
+  ideas: JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"),
+  filter: "all",
+  search: "",
+  editingId: null,
+  currentId: null,
+  page: "ideas"
+};
+
+const $ = id => document.getElementById(id);
+
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.ideas));
+}
+
+function uid(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
+
+function escapeHTML(value=""){
+  return value.replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+function formatDate(date){
+  return new Intl.DateTimeFormat("ar-EG",{
+    day:"numeric",month:"short",year:"numeric"
+  }).format(new Date(date));
+}
+
+function cardHTML(idea){
+  const color = {
+    "مشروع":"#8b5cf6",
+    "محتوى":"#06b6d4",
+    "دراسة":"#f59e0b",
+    "تقنية":"#22c55e",
+    "فكرة":"#ec4899"
+  }[idea.category] || "#8b5cf6";
+
+  const tags = (idea.tags || []).slice(0,4).map(
+    t => `<span class="tag">#${escapeHTML(t)}</span>`
+  ).join("");
+
+  return `
+    <article class="card" style="--card-color:${color}" data-id="${idea.id}">
+      <div class="card-top">
+        <span class="category">${escapeHTML(idea.category)}</span>
+        <button class="more" data-action="menu" data-id="${idea.id}">⋮</button>
+      </div>
+      <h4>${escapeHTML(idea.title)}</h4>
+      <p>${escapeHTML(idea.body)}</p>
+      <div class="tags">${tags}</div>
+      <div class="card-footer">
+        <span>${formatDate(idea.createdAt)}</span>
+        <span>${idea.favorite ? "★ مفضلة" : ""}</span>
+      </div>
+    </article>
+  `;
+}
+
+function emptyHTML(message){
+  return `<div class="empty">${message}</div>`;
+}
+
+function filteredIdeas(source){
+  return source.filter(idea=>{
+    const filterOK = state.filter === "all" || idea.category === state.filter;
+    const q = state.search.trim().toLowerCase();
+    const searchOK = !q ||
+      idea.title.toLowerCase().includes(q) ||
+      idea.body.toLowerCase().includes(q) ||
+      (idea.tags || []).join(" ").toLowerCase().includes(q);
+    return filterOK && searchOK;
+  });
+}
+
+function render(){
+  $("sideCount").textContent = state.ideas.length;
+  $("favoriteCount").textContent = `${state.ideas.filter(i=>i.favorite).length} فكرة`;
+
+  const normal = state.ideas.filter(i=>!i.archived && !i.project);
+  const filtered = filteredIdeas(normal);
+
+  $("ideasGrid").innerHTML = filtered.length
+    ? filtered.map(cardHTML).join("")
+    : emptyHTML("لا توجد أفكار مطابقة.");
+
+  const favorites = state.ideas.filter(i=>i.favorite && !i.archived);
+  $("favoritesGrid").innerHTML = favorites.length
+    ? favorites.map(cardHTML).join("")
+    : emptyHTML("لم تضف أي فكرة إلى المفضلة بعد.");
+
+  const projects = state.ideas.filter(i=>i.project && !i.archived);
+  $("projectsGrid").innerHTML = projects.length
+    ? projects.map(cardHTML).join("")
+    : emptyHTML("لا توجد مشاريع بعد.");
+
+  const archive = state.ideas.filter(i=>i.archived);
+  $("archiveGrid").innerHTML = archive.length
+    ? archive.map(cardHTML).join("")
+    : emptyHTML("الأرشيف فارغ.");
+
+  document.querySelectorAll(".card").forEach(card=>{
+    card.addEventListener("click", e=>{
+      if(e.target.closest("[data-action='menu']")) return;
+      openDetail(card.dataset.id);
+    });
+  });
+
+  document.querySelectorAll("[data-action='menu']").forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      e.stopPropagation();
+      const idea = state.ideas.find(i=>i.id===btn.dataset.id);
+      if(!idea) return;
+
+      const action = prompt(
+        "اكتب رقم العملية:\n1 تعديل\n2 مفضلة/إلغاء المفضلة\n3 تحويل إلى مشروع\n4 أرشفة\n5 حذف"
+      );
+
+      if(action==="1") openEdit(idea.id);
+      if(action==="2") toggleFavorite(idea.id);
+      if(action==="3") convertProject(idea.id);
+      if(action==="4") archiveIdea(idea.id);
+      if(action==="5") deleteIdea(idea.id);
+    });
+  });
+}
+
+function openModal(){
+  $("modalOverlay").classList.add("show");
+  setTimeout(()=>$("ideaTitle").focus(),50);
+}
+
+function closeModal(){
+  $("modalOverlay").classList.remove("show");
+  $("ideaForm").reset();
+  state.editingId = null;
+  $("modalTitle").textContent = "فكرة جديدة";
+}
+
+function openEdit(id){
+  const idea = state.ideas.find(i=>i.id===id);
+  if(!idea) return;
+
+  state.editingId = id;
+  $("modalTitle").textContent = "تعديل الفكرة";
+  $("ideaTitle").value = idea.title;
+  $("ideaBody").value = idea.body;
+  $("ideaCategory").value = idea.category;
+  $("ideaTags").value = (idea.tags || []).join("، ");
+  openModal();
+}
+
+$("ideaForm").addEventListener("submit", e=>{
+  e.preventDefault();
+
+  const data = {
+    title:$("ideaTitle").value.trim(),
+    body:$("ideaBody").value.trim(),
+    category:$("ideaCategory").value,
+    tags:$("ideaTags").value.split(/[،,]/).map(x=>x.trim()).filter(Boolean)
+  };
+
+  if(state.editingId){
+    const idea = state.ideas.find(i=>i.id===state.editingId);
+    Object.assign(idea,data);
+  }else{
+    state.ideas.unshift({
+      id:uid(),
+      ...data,
+      favorite:false,
+      project:false,
+      archived:false,
+      createdAt:new Date().toISOString()
+    });
+  }
+
+  save();
+  render();
+  closeModal();
+});
+
+function openDetail(id){
+  const idea = state.ideas.find(i=>i.id===id);
+  if(!idea) return;
+
+  state.currentId = id;
+  $("ideasPage").classList.remove("show");
+  $("favoritesPage").classList.remove("show");
+  $("projectsPage").classList.remove("show");
+  $("archivePage").classList.remove("show");
+  $("detailPage").classList.add("show");
+
+  $("pageTitle").textContent = idea.title;
+  $("pageSubtitle").textContent = "تفاصيل الفكرة";
+  $("detailTitle").textContent = idea.title;
+  $("detailBody").textContent = idea.body;
+
+  $("detailMeta").innerHTML =
+    `<span class="category">${escapeHTML(idea.category)}</span>
+     <span class="category">${formatDate(idea.createdAt)}</span>`;
+
+  $("detailTags").innerHTML = (idea.tags||[]).map(
+    t=>`<span class="tag">#${escapeHTML(t)}</span>`
+  ).join("");
+
+  $("favoriteDetailBtn").textContent = idea.favorite
+    ? "★ إزالة من المفضلة" : "☆ إضافة للمفضلة";
+
+  $("projectDetailBtn").textContent = idea.project
+    ? "✓ مشروع" : "◈ تحويل إلى مشروع";
+
+  $("archiveDetailBtn").textContent = idea.archived
+    ? "↩ استعادة من الأرشيف" : "▣ أرشفة";
+}
+
+function closeDetail(){
+  $("detailPage").classList.remove("show");
+  changePage("ideas");
+}
+
+function toggleFavorite(id){
+  const idea = state.ideas.find(i=>i.id===id);
+  if(!idea) return;
+  idea.favorite = !idea.favorite;
+  save();
+  render();
+  if(state.currentId===id) openDetail(id);
+}
+
+function convertProject(id){
+  const idea = state.ideas.find(i=>i.id===id);
+  if(!idea) return;
+  idea.project = !idea.project;
+  save();
+  render();
+  if(state.currentId===id) openDetail(id);
+}
+
+function archiveIdea(id){
+  const idea = state.ideas.find(i=>i.id===id);
+  if(!idea) return;
+  idea.archived = !idea.archived;
+  save();
+  render();
+  if(state.currentId===id) openDetail(id);
+}
+
+function deleteIdea(id){
+  if(!confirm("هل تريد حذف هذه الفكرة نهائيًا؟")) return;
+  state.ideas = state.ideas.filter(i=>i.id!==id);
+  save();
+  render();
+  if(state.currentId===id) closeDetail();
+}
+
+function changePage(page){
+  state.page = page;
+  state.filter = "all";
+  state.search = "";
+  $("searchInput").value = "";
+
+  document.querySelectorAll(".dashboard").forEach(x=>x.classList.remove("show"));
+  $("detailPage").classList.remove("show");
+
+  const map = {
+    ideas:["ideasPage","غرفة الأفكار","مساحتك الخاصة للأفكار والمشاريع."],
+    favorites:["favoritesPage","المفضلة","الأفكار التي تريد العودة إليها."],
+    projects:["projectsPage","المشاريع","الأفكار التي بدأت تتحول إلى واقع."],
+    archive:["archivePage","الأرشيف","الأفكار المحفوظة بعيدًا عن الغرفة."]
+  };
+
+  const [id,title,subtitle] = map[page];
+  $(id).classList.add("show");
+  $("pageTitle").textContent = title;
+  $("pageSubtitle").textContent = subtitle;
+
+  document.querySelectorAll(".nav button").forEach(b=>{
+    b.classList.toggle("active",b.dataset.page===page);
+  });
+
+  $("sidebar").classList.remove("open");
+  render();
+}
+
+document.querySelectorAll(".nav button").forEach(btn=>{
+  btn.addEventListener("click",()=>changePage(btn.dataset.page));
+});
+
+$("addBtn").addEventListener("click",()=>{
+  state.editingId=null;
+  $("modalTitle").textContent="فكرة جديدة";
+  openModal();
+});
+
+$("closeModal").addEventListener("click",closeModal);
+$("cancelBtn").addEventListener("click",closeModal);
+
+$("modalOverlay").addEventListener("click",e=>{
+  if(e.target===$("modalOverlay")) closeModal();
+});
+
+$("searchInput").addEventListener("input",e=>{
+  state.search=e.target.value;
+  render();
+});
+
+document.querySelectorAll(".filter").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    state.filter=btn.dataset.filter;
+    render();
+  });
+});
+
+$("backBtn").addEventListener("click",closeDetail);
+
+$("favoriteDetailBtn").addEventListener("click",()=>{
+  if(state.currentId) toggleFavorite(state.currentId);
+});
+
+$("projectDetailBtn").addEventListener("click",()=>{
+  if(state.currentId) convertProject(state.currentId);
+});
+
+$("archiveDetailBtn").addEventListener("click",()=>{
+  if(state.currentId) archiveIdea(state.currentId);
+});
+
+$("deleteDetailBtn").addEventListener("click",()=>{
+  if(state.currentId) deleteIdea(state.currentId);
+});
+
+$("randomBtn").addEventListener("click",()=>{
+  const available=state.ideas.filter(i=>!i.archived);
+  if(!available.length){
+    alert("أضف فكرة أولًا.");
+    return;
+  }
+  const idea=available[Math.floor(Math.random()*available.length)];
+  openDetail(idea.id);
+});
+
+$("menuBtn").addEventListener("click",()=>{
+  $("sidebar").classList.toggle("open");
+});
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    closeModal();
+    $("sidebar").classList.remove("open");
+  }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){
+    e.preventDefault();
+    $("searchInput").focus();
+  }
+});
+
+if(!state.ideas.length){
+  state.ideas=[
+    {
+      id:uid(),
+      title:"فكرة تحتاج إلى تطوير",
+      body:"هذه مساحة تجريبية. ابدأ بكتابة فكرتك الأولى، ثم أضف إليها التفاصيل والكلمات المفتاحية وحوّلها إلى مشروع عندما تصبح جاهزة.",
+      category:"فكرة",
+      tags:["بداية","تطوير"],
+      favorite:true,
+      project:false,
+      archived:false,
+      createdAt:new Date().toISOString()
+    }
+  ];
+  save();
+}
+
+render();
+</script>
+
+</body>
+</html>
